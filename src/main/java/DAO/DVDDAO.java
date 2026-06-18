@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
+
+import control.DataSourceFactory;
 import model.DVD;
 
 public class DVDDAO {
@@ -59,24 +61,26 @@ public class DVDDAO {
     }
 
     public void insert(DVD dvd) throws SQLException {
-        String sql = "INSERT INTO DVD(nome, durata, regista, inCatalogo) VALUES (?, ?, ?, TRUE)";
+        String sql = "INSERT INTO DVD(nome, durata, regista, prezzo, inCatalogo) VALUES (?, ?, ?, ?, TRUE)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, dvd.getNome());
             statement.setInt(2, dvd.getDurata());
             statement.setString(3, dvd.getRegista());	
+            statement.setFloat(4, dvd.getPrezzo());
             statement.executeUpdate();
         }
     }
 
     public void update(DVD dvd) throws SQLException {
-        String sql = "UPDATE DVD SET nome = ?, durata = ?, regista = ? WHERE id = ?";
+        String sql = "UPDATE DVD SET nome = ?, durata = ?, regista = ?, prezzo = ? WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, dvd.getNome());
             statement.setInt(2, dvd.getDurata());
             statement.setString(3, dvd.getRegista());
-            statement.setInt(4, dvd.getId());
+            statement.setFloat(4, dvd.getPrezzo());
+            statement.setInt(5, dvd.getId());
             statement.executeUpdate();
         }
     }
@@ -105,6 +109,7 @@ public class DVDDAO {
                 resultSet.getString("nome"),
                 resultSet.getInt("durata"),
                 resultSet.getString("regista"),
+                resultSet.getFloat("prezzo"),
                 resultSet.getBoolean("inCatalogo")
         );
     }

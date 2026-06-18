@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet("/admin")
-public class AdminServlet extends HttpServlet {
+@WebServlet("/admin/catalogo")
+public class AdminCatalogoServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private final DVDDAO dvdDAO = new DVDDAO();
 
@@ -24,7 +24,7 @@ public class AdminServlet extends HttpServlet {
         try {
             if ("add".equals(action)) {
                 request.setAttribute("mode", "add");
-                request.getRequestDispatcher("/WEB-INF/view/admin/Admin.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/view/admin/Catalogo.jsp").forward(request, response);
                 return;
             }
 
@@ -33,14 +33,14 @@ public class AdminServlet extends HttpServlet {
                 DVD dvd = dvdDAO.findById(id);
                 request.setAttribute("mode", "edit");
                 request.setAttribute("dvd", dvd);
-                request.getRequestDispatcher("/WEB-INF/view/admin/Admin.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/view/admin/Catalogo.jsp").forward(request, response);
                 return;
             }
 
             List<DVD> dvds = dvdDAO.findAll();
             request.setAttribute("mode", "list");
             request.setAttribute("dvds", dvds);
-            request.getRequestDispatcher("/WEB-INF/view/admin/Admin.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/view/admin/Catalogo.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException(e);
         }
@@ -66,7 +66,7 @@ public class AdminServlet extends HttpServlet {
                 dvdDAO.reinsert(id);
             }
             
-            response.sendRedirect(request.getContextPath() + "/admin?action=list");
+            response.sendRedirect(request.getContextPath() + "/admin/catalogo?action=list");
         } catch (SQLException e) {
             throw new ServletException(e);
         }
@@ -76,6 +76,7 @@ public class AdminServlet extends HttpServlet {
         String nome = request.getParameter("nome");
         int durata = Integer.parseInt(request.getParameter("durata"));
         String regista = request.getParameter("regista");
-        return new DVD(0, nome, durata, regista, true);
+        float prezzo = Float.parseFloat(request.getParameter("prezzo"));
+        return new DVD(0, nome, durata, regista, prezzo, true);
     }
 }

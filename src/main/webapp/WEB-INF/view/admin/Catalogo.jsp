@@ -20,7 +20,7 @@
 <p><a href="<%= request.getContextPath() %>/home">Torna alla home</a></p>
 
 <% if ("list".equals(mode)) { %>
-    <form action="<%= request.getContextPath() %>/admin" method="get">
+    <form action="<%= request.getContextPath() %>/admin/catalogo" method="get">
         <input type="hidden" name="action" value="add" />
         <button type="submit">Aggiungi nuovo DVD</button>
     </form>
@@ -32,6 +32,7 @@
                 <th>Nome</th>
                 <th>Durata</th>
                 <th>Regista</th>
+                <th>Prezzo</th>
                 <th>Azioni</th>
             </tr>
         </thead>
@@ -44,20 +45,22 @@
                 <td><%= current.getNome() %></td>
                 <td><%= current.getDurata() %> min</td>
                 <td><%= current.getRegista() %></td>
+                <td><%= current.getPrezzo() %>€</td>
+                
                 <td class="actions">
-                    <form action="<%= request.getContextPath() %>/admin" method="get" style="display:inline;">
+                    <form action="<%= request.getContextPath() %>/admin/catalogo" method="get" style="display:inline;">
                         <input type="hidden" name="action" value="edit" />
                         <input type="hidden" name="id" value="<%= current.getId() %>" />
                         <button type="submit">Modifica</button>
                     </form>
-                   <% if (current.isInCatalogo()) { %> 
-                    <form action="<%= request.getContextPath() %>/admin" method="post" style="display:inline;">
+                   <% if (current.isInCatalogo()) { %> 	
+                    <form action="<%= request.getContextPath() %>/admin/catalogo" method="post" style="display:inline;">
                         <input type="hidden" name="action" value="delete" />
                         <input type="hidden" name="id" value="<%= current.getId() %>" />
                         <button type="submit">Elimina</button>
                     </form>
 					<% } else { %> 
-					<form action="<%= request.getContextPath() %>/admin" method="post" style="display:inline;">
+					<form action="<%= request.getContextPath() %>/admin/catalogo" method="post" style="display:inline;">
                         <input type="hidden" name="action" value="reinsert" />
                         <input type="hidden" name="id" value="<%= current.getId() %>" />
                         <button type="submit">Riaggungi</button>
@@ -74,7 +77,7 @@
 
 <% } else if ("add".equals(mode) || "edit".equals(mode)) { %>
     <h2><%= "add".equals(mode) ? "Aggiungi DVD" : "Modifica DVD" %></h2>
-    <form action="<%= request.getContextPath() %>/admin" method="post">
+    <form action="<%= request.getContextPath() %>/admin/catalogo" method="post">
         <input type="hidden" name="action" value="<%= "add".equals(mode) ? "create" : "update" %>" />
         <% if ("edit".equals(mode) && dvd != null) { %>
             <input type="hidden" name="id" value="<%= dvd.getId() %>" />
@@ -91,8 +94,12 @@
             <label for="regista">Regista:</label>
             <input type="text" id="regista" name="regista" value="<%= dvd != null ? dvd.getRegista() : "" %>" required />
         </div>
+        <div>
+        	<label for="prezzo">Prezzo (€):</label>
+            <input type="number" id="prezzo"  step="0.01" name="prezzo" value="<%= dvd != null ? dvd.getPrezzo() : "" %>" required />
+        </div>
         <button type="submit"><%= "add".equals(mode) ? "Crea" : "Aggiorna" %></button>
-        <a href="<%= request.getContextPath() %>/admin?action=list">Annulla</a>
+        <a href="<%= request.getContextPath() %>/admin/catalogo?action=list">Annulla</a>
     </form>
 <% } else { %>
     <p>Modalità non valida.</p>

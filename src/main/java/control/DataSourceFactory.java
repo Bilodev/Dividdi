@@ -1,10 +1,12 @@
-package DAO;
+package control;
 
 import java.sql.SQLException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+
+import DAO.ConnectionPool;
 
 public final class DataSourceFactory {
     private static final DataSource DATA_SOURCE;
@@ -21,6 +23,7 @@ public final class DataSourceFactory {
 
         if (dataSource == null) {
             try {
+            	
                 dataSource = new ConnectionPool("jdbc:mysql://localhost:3306/dividdi", "anto", "anto");
             } catch (SQLException e) {
                 throw new ExceptionInInitializerError("Unable to create connection pool: " + e.getMessage());

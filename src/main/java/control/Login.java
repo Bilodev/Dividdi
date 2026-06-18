@@ -42,6 +42,7 @@ public class Login extends HttpServlet {
             HttpSession session = request.getSession(true);
             session.setAttribute("username", utente.getUsername());
             session.setAttribute("nome", utente.getUsername());
+            session.setAttribute("utenteId", utente.getId());
             session.setAttribute("admin", utente.isAdmin());
             response.sendRedirect(request.getContextPath() + "/home");
         } catch (SQLException e) {

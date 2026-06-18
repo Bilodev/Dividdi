@@ -37,12 +37,20 @@
     <h1>Benvenuto <%= nome %></h1>
     <div class="buttons" style="display: flex; gap: 8px; align-items: center;">
         <% if (isAdmin) { %>
-            <form action="<%= request.getContextPath() %>/admin" method="get" style="display: inline;">
+            <form action="<%= request.getContextPath() %>/admin/catalogo" method="get" style="display: inline;">
                 <button type="submit">Gestione Catalogo</button>
             </form>
+			<form action="<%= request.getContextPath() %>/admin/ordini" method="get" style="display: inline;">
+                <button type="submit">Gestisci ordini utenti</button>
+            </form>
+            
         <% } %>
         <form action="<%= request.getContextPath() %>/logout" method="post" style="display: inline;">
             <button type="submit">Logout</button>
+        </form>
+        
+        <form action="<%= request.getContextPath() %>/ordini" method="get" style="display: inline;">
+            <button type="submit">I miei Ordini</button>
         </form>
     </div>
 <% } else { %>
@@ -86,13 +94,14 @@
                 if (data.length === 0) {
                     resultsContainer.innerHTML = '<p>Nessun DVD trovato.</p>';
                 } else {
-                    let html = '<h2>Risultati ricerca</h2><table><thead><tr><th>Nome</th><th>Durata</th><th>Regista</th><th>Azioni</th></tr></thead><tbody>';
+                    let html = '<h2>Risultati ricerca</h2><table><thead><tr><th>Nome</th><th>Durata</th><th>Regista</th><th>Prezzo</th><th>Azioni</th></tr></thead><tbody>';
                     data.forEach(dvd => {
-                        html += '<tr><td>' + dvd.nome + '</td><td>' + dvd.durata + ' min</td><td>' + dvd.regista + '</td>';
-                        html += '<td><button onclick="addToCart(' + dvd.id + ', \'' + dvd.nome.replace(/'/g, "\\'") + '\', ' + dvd.durata + ', \'' + dvd.regista.replace(/'/g, "\\'") + '\')">Aggiungi al carrello</button></td>';
+                        html += '<tr><td>' + dvd.nome + '</td><td>' + dvd.durata + ' min</td><td>' + dvd.regista + '</td>' + '<td>'+ dvd.prezzo +'€</td>'; 
+                        html += '<td><button onclick="addToCart(' + dvd.id + ', \'' + dvd.nome.replace(/'/g, "\\'") + '\', ' + dvd.durata + ', \'' + dvd.regista.replace(/'/g, "\\'") + '\', '+ dvd.prezzo + '\)">Aggiungi al carrello</button></td>';
                         html += '</tr>';
                     });
                     html += '</tbody></table>';
+                    
                     resultsContainer.innerHTML = html;
                 }
             })
@@ -102,13 +111,13 @@
             });
     });
 
-    function addToCart(id, nome, durata, regista) {
+    function addToCart(id, nome, durata, regista, prezzo) {
         fetch(contextPath + '/cart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: 'action=add&id=' + id + '&nome=' + encodeURIComponent(nome) + '&durata=' + durata + '&regista=' + encodeURIComponent(regista)
+            body: 'action=add&id=' + id + '&nome=' + encodeURIComponent(nome) + '&durata=' + durata + '&regista=' + encodeURIComponent(regista) + '&prezzo=' + prezzo	
         })
             .then(response => response.json())
             .then(data => {

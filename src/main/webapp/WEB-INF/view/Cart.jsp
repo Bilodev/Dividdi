@@ -12,35 +12,16 @@
 </style>
 </head>
 <body>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="model.DVDInCart" %>
 <%
     javax.servlet.http.HttpSession currentSession = request.getSession(false);
-    String cartJson = currentSession != null ? (String) currentSession.getAttribute("cart") : null;
-    java.util.List<java.util.Map<String, String>> cartItems = new java.util.ArrayList<>();
-    
-    if (cartJson != null && !cartJson.isEmpty() && !cartJson.equals("[]")) {
-        String content = cartJson.substring(1, cartJson.length() - 1);
-        if (!content.isEmpty()) {
-            java.util.regex.Pattern p = java.util.regex.Pattern.compile("\\{[^}]+\\}");
-            java.util.regex.Matcher m = p.matcher(cartJson);
-            while (m.find()) {
-                String item = m.group().replaceAll("[{}\"\\\\]", "");
-                java.util.Map<String, String> map = new java.util.HashMap<>();
-                String[] pairs = item.split(",");
-                for (String pair : pairs) {
-                    String[] kv = pair.split(":");
-                    if (kv.length == 2) {
-                        map.put(kv[0].trim(), kv[1].trim());
-                    }
-                }
-                if (!map.isEmpty()) cartItems.add(map);
-            }
-        }
-    }
+    ArrayList<DVDInCart> cartList = currentSession != null ? (ArrayList<DVDInCart>) currentSession.getAttribute("cart") : new ArrayList<DVDInCart>();
 %>
 <h1>Il Mio Carrello</h1>
 <p><a href="<%= request.getContextPath() %>/home">Torna alla home</a></p>
 
-<% if (cartItems.isEmpty()) { %>
+<% if (cartList == null || cartList.isEmpty()) { %>
     <p>Il carrello è vuoto.</p>
 <% } else { %>
     <table>
@@ -48,18 +29,29 @@
             <tr>
                 <th>Nome</th>
                 <th>Durata</th>
-                <th>Regista</th>
+                <th>Regista</th> 
+                <th>Prezzo</th>                               
+                <th>Quantità</th>
                 <th>Azioni</th>
             </tr>
         </thead>
         <tbody>
-        <% for (java.util.Map<String, String> item : cartItems) { %>
+        <% for (int i = 0; i < cartList.size(); i++) { %>
             <tr>
-                <td><%= item.get("nome") %></td>
-                <td><%= item.get("durata") %> min</td>
-                <td><%= item.get("regista") %></td>
+                <td><%= cartList.get(i).getNome() %></td>
+                <td><%= cartList.get(i).getDurata() %> min</td>
+                <td><%= cartList.get(i).getRegista() %></td>
+                <td><%= cartList.get(i).getPrezzo() %>€</td>
+				<td>
+					<%= cartList.get(i).getQuantity() %> 
+					<button onclick="updateCart(<%= cartList.get(i).getId() %>, 1 )">+</button> 
+					<% if (cartList.get(i).getQuantity() >= 2){ %>
+						<button onclick="updateCart(<%= cartList.get(i).getId() %>, -1 )">-</button> 
+					<% } %>
+				</td>
+                
                 <td class="actions">
-                    <button onclick="removeFromCart(<%= item.get("id") %>)">Rimuovi</button>
+                    <button onclick="removeFromCart(<%= cartList.get(i).getId() %>)">Rimuovi</button>
                 </td>
             </tr>
         <% } %>
@@ -67,17 +59,41 @@
     </table>
 <% } %>
 	<br> <br>
-	<% if (!cartItems.isEmpty() && currentSession.getAttribute("nome") != null) { %>
-		<form action="<%= request.getContextPath() %>/checkout" method="post" style="display: inline;">
-            <button type="submit">Checkout</button>
+	<% if (cartList != null && !cartList.isEmpty() && currentSession.getAttribute("nome") != null) { %>
+		
+		<% float sum = 0; for (int i = 0; i < cartList.size(); i++) sum += cartList.get(i).getPrezzo() * cartList.get(i).getQuantity(); %>
+		<form action="<%= request.getContextPath() %>/checkout" method="get" style="display: inline;">
+            <button type="submit">Checkout <%= sum %>€</button>
         </form>
 		
-	<%  } else if (!cartItems.isEmpty())  {	%>
+	<%  } else if (cartList != null && !cartList.isEmpty())  {	%>
 		<form action="<%= request.getContextPath() %>/login" method="get" style="display: inline;">
             <button type="submit">LogIn per acquistare</button>
         </form>
 	<% } %>
+	<% if (cartList != null && !cartList.isEmpty()) {%>
+	<button onclick="svuotaCarrello()">Svuota Carrello</button>
+	<% } %>
+</body>
 <script>
+
+function svuotaCarrello(){
+    fetch('<%= request.getContextPath() %>/cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=emptyCart'
+        })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => console.error('Errore:', error))
+}
+
 function removeFromCart(id) {
     fetch('<%= request.getContextPath() %>/cart', {
         method: 'POST',
@@ -94,6 +110,22 @@ function removeFromCart(id) {
     })
     .catch(error => console.error('Errore:', error));
 }
+
+function updateCart(id, value) {
+    fetch('<%= request.getContextPath() %>/cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=updateQuantity&id=' + id + "&qt=" + value
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => console.error('Errore:', error));
+}
 </script>
-</body>
 </html>

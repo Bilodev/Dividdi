@@ -37,7 +37,8 @@ public class SearchAPI extends HttpServlet {
                 json.append("\"id\":").append(dvd.getId()).append(",");
                 json.append("\"nome\":\"" ).append(escapeJson(dvd.getNome())).append("\",");
                 json.append("\"durata\":").append(dvd.getDurata()).append(",");
-                json.append("\"regista\":\"" ).append(escapeJson(dvd.getRegista())).append("\"");
+                json.append("\"regista\":\"" ).append(escapeJson(dvd.getRegista())).append("\",");
+                json.append("\"prezzo\":\"" ).append(dvd.getPrezzo()).append("\"");                
                 json.append("}");
             }
             json.append("]");
