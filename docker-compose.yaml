@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  # Servizio Database (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dividdi
+      MYSQL_USER: anto
+      MYSQL_PASSWORD: anto
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # Servizio Applicazione (Tomcat)
+  web:
+    build: .
+    container_name: tomcat_container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge

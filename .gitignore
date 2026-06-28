@@ -1,2 +1,15 @@
-build/*
-settings/*
+# Escludi il file WAR compilato (Docker lo ricrea o lo usa localmente)
+Dividdi.war
+
+# Escludi l'intera cartella di build generata da Eclipse/Java
+build/
+
+# Escludi file di documentazione pesante o slide/consegne (opzionale)
+WDD.pdf
+
+# Escludi i file di configurazione locale di Eclipse (se presenti nascosti)
+.metadata/
+.settings/
+.classpath
+.project
+*.tmp
